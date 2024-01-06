@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
     // Logging setting
     log_set_level(LOG_TRACE);
     log_set_quiet(true);
-    /*FILE* logFile = fopen("./debug-log.log", "w");*/
-    FILE* logFile = fopen("/home/zliu272/dedup.log", "w");
+    FILE* logFile = fopen("./debug.log", "w");
+    //FILE* logFile = fopen("/home/zliu272/dedup.log", "w");
     if (logFile == NULL)
         return -1;
     log_add_fp(logFile, LOG_FATAL);

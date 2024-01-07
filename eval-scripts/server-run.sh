@@ -36,7 +36,7 @@ do
             fi
         done
 
-        if [ newtest ]
+        if [ newtest = true ]
         then
             mv "./sv-test-c.log ./replay/sv-$fid-$algo.log"
         fi

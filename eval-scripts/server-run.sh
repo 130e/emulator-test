@@ -1,6 +1,8 @@
 #!/bin/bash
 
 iperf3=iperf3 # at least 3.9
+exe="./handoff"
+algo="westwood"
 
 downtown=({1..6})
 parkinglot=(7)
@@ -15,15 +17,17 @@ for loc_idx in "${!locations[@]}"; do
     echo "location ${labels[$loc_idx]}"
     declare -n traces=${locations[$loc_idx]}
     for id in "${traces[@]}"; do
-        fname="./replay/cl-$id-westwood.log"
-        echo "prepare to test $fname"
+        inputfname="./input/trace-$id-c.csv"
+        outputfname="./replay/sv-$id-$algo.log"
+        echo "prepare to test $inputfname and generate $outputfname"
         read ans
 
         if [ -z ${ans} ]; then
             echo "skipped"
         elif [ $ans = "y" ]; then
-            $iperf3 -s -i 0.1 -J --logfile $fname -1
+            $exe $inputfname
             echo "Waiting for key press to clear log and restart..."
+            mv "./replay/sv-test-c.log ./replay/sv-$fid-$algo.log"
         else
             echo "unkonwn input. Skipped."
         fi

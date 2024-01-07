@@ -20,9 +20,10 @@ do
     do
         outputfname="./replay/cl-$id-$algo.log"
         newtest=false
+        echo "[client] Ready to test $outputfname"
         while true
         do
-            read -p "[client] Ready to test $outputfname; test? y/N" ans
+            read -p "test? y/N <- " ans
             if ! [ -z "${ans}" ] && [ "${ans}" = "y" ]
             then
                 $iperf3 -s -i 0.1 -J --logfile $outputfname -1
@@ -31,10 +32,6 @@ do
                 echo "Skipped"
                 break
             fi
-            #if [ newtest ]
-            #then
-                #mv "./sv-test-c.log ./replay/sv-$fid-$algo.log"
-            #fi
         done
     done
 done

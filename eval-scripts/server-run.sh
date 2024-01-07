@@ -22,9 +22,10 @@ do
         inputfname="./input/trace-$id-c.csv"
         outputfname="./replay/sv-$id-$algo.log"
         newtest=false
+        echo "[server] Ready to test $inputfname and generate $outputfname"
         while true
         do
-            read -p "[server] Ready to test $inputfname and generate $outputfname; test? y/N" ans
+            read -p "test? y/N <- " ans
             if ! [ -z "${ans}" ] && [ "${ans}" = "y" ]
             then
                 $exe $inputfname
@@ -33,10 +34,11 @@ do
                 echo "Skipped"
                 break
             fi
-            if [ newtest ]
-            then
-                mv "./sv-test-c.log ./replay/sv-$fid-$algo.log"
-            fi
         done
+
+        if [ newtest ]
+        then
+            mv "./sv-test-c.log ./replay/sv-$fid-$algo.log"
+        fi
     done
 done

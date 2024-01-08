@@ -1,7 +1,13 @@
 #!/bin/bash
 
 iperf3=iperf3 # at least 3.9
-algo="westwood"
+algo="$1"
+
+if [ -z "$algo" ]
+then
+    echo "specify algorithm"
+    exit
+fi
 
 downtown=({1..6})
 parkinglot=(7)

@@ -2,7 +2,13 @@
 
 iperf3=iperf3 # at least 3.9
 exe="./handoff"
-algo="westwood"
+algo="$1"
+
+if [ -z "$algo" ]
+then
+    echo "specify algorithm"
+    exit
+fi
 
 downtown=({1..6})
 parkinglot=(7)
@@ -28,17 +34,22 @@ do
             read -p "test? y/N <- " ans
             if ! [ -z "${ans}" ] && [ "${ans}" = "y" ]
             then
+                netstat -s | grep segments > prev-${algo}.txt
                 $exe $inputfname
                 newtest=true
+                sleep 1
+                netstat -s | grep segments > after-${algo}.txt
+                mv ./sv-test-c.log $outputfname
+                echo "file written"
             else
                 echo "Skipped"
                 break
             fi
         done
-
-        if [ newtest = true ]
-        then
-            mv "./sv-test-c.log ./replay/sv-$fid-$algo.log"
-        fi
+        #if [ $newtest = true ]
+        #then
+            #echo "New file written"
+            #mv "./sv-test-c.log ./replay/sv-$fid-$algo.log"
+        #fi
     done
 done

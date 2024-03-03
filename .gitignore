@@ -1,3 +1,4 @@
+# CLion
 .idea/
 .DS_Store
 
@@ -71,3 +72,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# allow precompiled static libs
+!lib/lib/*.a
+!lib/lib/*.la

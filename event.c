@@ -275,27 +275,36 @@ int parse_event(scheduler_ctx *scheduler, action_ctx *action, char *text) {
 
     tok = strtok(NULL, ",");
     switch (event) {
+        // init nfq
         case EVENT_INIT:
             parse_init(scheduler, action, time_ms, tok);
             break;
+        // run shell cmd
         case EVENT_CMD:
             parse_cmd(scheduler, time_ms, tok);
             break;
+        // server trigger handover event 
         case EVENT_HO:
             parse_ho(scheduler, action, time_ms, tok);
             break;
-        case EVENT_HANDLEDUP:
+
+        // client side
+        // legacy unused separate options
+        case EVENT_SOL_HANDLEDUP:
             parse_handle_dup(scheduler, action, time_ms, tok);
             break;
-        case EVENT_HANDLERW:
+        case EVENT_SOL_HANDLERW:
             /*parse_handle_rw(scheduler, action, time_ms, tok);*/
             break;
-        case EVENT_INIT_SCHED:
+        // init parameters for solution
+        case EVENT_SOL_INIT_SCHED:
             parse_init_sched(scheduler, action, time_ms, tok);
             break;
-        case EVENT_HANDLEDSOL:
+        // emulate handover and triggers solution
+        case EVENT_SOL_HO:
             parse_handle_solution(scheduler, action, time_ms, tok); 
             break;
+
         default:
             log_error("No event matched at %d", time_ms);
             return -1;

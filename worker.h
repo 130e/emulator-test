@@ -19,6 +19,7 @@ typedef struct {
     /* Whether to drop packets and the number */
     int do_drop;
     int drop_count;
+
     // solution
     /* Whether to modify the rwnd field and the value */
     int do_rwnd; // whether to use tune_rwnd

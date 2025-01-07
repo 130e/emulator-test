@@ -1,9 +1,16 @@
-# CLion
+# Test
+build/
+test/
+libnetfilter_queue*
+libnfnetlink*
+
+# IDE
 .idea/
 .DS_Store
+.vs_code
 
 # Generated
-handoff
+emulator
 *.log
 
 # CMake
@@ -12,7 +19,7 @@ CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
-Testing
+
 # Makefile
 cmake_install.cmake
 install_manifest.txt

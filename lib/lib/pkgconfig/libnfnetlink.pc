@@ -1,6 +1,6 @@
 # libnfnetlink pkg-config file
 
-prefix=/home/sunfish/Projects/emulator-test/lib
+prefix=/data/ztliu/emulator-test/libnfnetlink-1.0.2/../lib
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include

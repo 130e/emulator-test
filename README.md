@@ -74,7 +74,7 @@ cd script-pool/emulator/
 # test_a -veth0- test_b
 #        -veth1-
 #        -veth2-
-sudo ./netns.sh create test a b
+sudo ./netns.sh create test a b 3
 # Enter ns test_a
 sudo ./netns.sh exec test a bash
 # Now you're in the root shell of the namespace!

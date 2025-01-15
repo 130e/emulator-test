@@ -1,6 +1,7 @@
 # Test
 build/
 test/
+output/
 libnetfilter_queue*
 libnfnetlink*
 

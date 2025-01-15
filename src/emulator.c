@@ -35,7 +35,6 @@ int main(int argc, char **argv) {
   log_set_quiet(true);
   // TODO: give log id
   FILE* logFile = fopen("./debug.log", "w");
-  //FILE* logFile = fopen("/home/zliu272/dedup.log", "w");
   if (logFile == NULL)
     return -1;
   log_add_fp(logFile, LOG_FATAL);
@@ -62,6 +61,30 @@ int main(int argc, char **argv) {
   while (fgets(line, CSV_MAX_LINESZ, stream) != NULL) {
     parse_event(&scheduler, &action, line);
   }
+
+  // Debugging
+  // manual script event
+  /*int end_ms = 30000;*/
+  /*int simu_end_ms = end_ms + 3000;*/
+  /*// output queue*/
+  /*action_init_nfqueue_args action_init_args = {.ctx = &action, .queue_num = 0};*/
+  /*scheduler_add_event(&scheduler, 0, action_init_nfqueue, &action_init_args);*/
+  /*action_teardown_nfqueue_args action_teardown_args = {.ctx = &action, .queue_num = 0};*/
+  /*scheduler_add_event(&scheduler, simu_end_ms, action_teardown_nfqueue, &action_teardown_args);*/
+  /*action_start_nfqueue_args action_start_args = {.ctx = &action, .queue_num = 0};*/
+  /*scheduler_add_event(&scheduler, 0, action_start_nfqueue, &action_start_args);*/
+  
+  /*// input*/
+  /*action_init_nfqueue_args action_init1_args = {.ctx = &action, .queue_num = 1};*/
+  /*scheduler_add_event(&scheduler, 0, action_init_nfqueue, &action_init1_args);*/
+  /*action_teardown_nfqueue_args action_teardown1_args = {.ctx = &action, .queue_num = 1};*/
+  /*scheduler_add_event(&scheduler, simu_end_ms, action_teardown_nfqueue, &action_teardown1_args);*/
+  /*action_start_nfqueue_args action_start1_args = {.ctx = &action, .queue_num = 1};*/
+  /*scheduler_add_event(&scheduler, 0, action_start_nfqueue, &action_start1_args);*/
+
+  /*// mark*/
+  /*action_set_mark_args action_mark_args = {.ctx = &action, .queue_num = 0, .mark = 1};*/
+  /*scheduler_add_event(&scheduler, 0, action_set_mark, &action_mark_args);*/
 
   printf("Emulator starts\n");
   // start scheduler

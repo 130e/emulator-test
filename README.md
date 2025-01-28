@@ -90,6 +90,7 @@ You only need to run these **once** in your test_a (sender) environment.
 
 # Add iptables rules
 ./add_iptables.sh cleanup
+./add_iptables.sh setup
 # Add default tc rules
 ./load-tc-rules.sh auto
 ```
@@ -100,7 +101,7 @@ Go back to the emulator folder. We will run a debug trace to test the emulator.
 ```bash
 # Host B (ns 10.0.0.2)
 # listening for one iperf3 connection
-iperf3 -s -1 --logfile test.log
+iperf3 -s -1
 # Host A (ns 10.0.0.1)
 # Start the emulator; the iperf3 command is included in the trace.csv
 # It connects to 10.0.0.2 and starts sending

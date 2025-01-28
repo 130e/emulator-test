@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "event.h"
 #include "log.h"
@@ -262,51 +263,53 @@ int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time
     return 0;
 }
 
-// parse events
+// Function to map event type strings to enum
+event_type get_event_type(const char *event_str) {
+    if (strcmp(event_str, "INIT") == 0) return INIT;
+    if (strcmp(event_str, "CMD") == 0) return CMD;
+    if (strcmp(event_str, "HO") == 0) return HO;
+    if (strcmp(event_str, "SOL_HANDLEDUP") == 0) return SOL_HANDLEDUP;
+    if (strcmp(event_str, "SOL_HANDLERW") == 0) return SOL_HANDLERW;
+    if (strcmp(event_str, "SOL_INIT_SCHED") == 0) return SOL_INIT_SCHED;
+    if (strcmp(event_str, "SOL_HO") == 0) return SOL_HO;
+    return UNKNOWN;
+}
+
+// Updated parse_event function
 int parse_event(scheduler_ctx *scheduler, action_ctx *action, char *text) {
     char *tmp_str, *tok;
     tmp_str = strdup(text);
 
     tok = strtok(tmp_str, ","); // time
     int time_ms = strtol(tok, NULL, 0);
-    tok = strtok(NULL, ","); // event type
-    int event = strtol(tok, NULL, 0);
-    log_trace("Reading event %d", event);
+    tok = strtok(NULL, ","); // event type as text
+    event_type event = get_event_type(tok);
 
-    tok = strtok(NULL, ",");
+    log_trace("Reading event %s", tok);
+
+    tok = strtok(NULL, ","); // additional parameters
     switch (event) {
-        // init nfq
-        case EVENT_INIT:
+        case INIT:
             parse_init(scheduler, action, time_ms, tok);
             break;
-        // run shell cmd
-        case EVENT_CMD:
+        case CMD:
             parse_cmd(scheduler, time_ms, tok);
             break;
-        // server trigger handover event 
-        case EVENT_HO:
+        case HO:
             parse_ho(scheduler, action, time_ms, tok);
             break;
-
-        // client side
-        // legacy unused separate options
-        case EVENT_SOL_HANDLEDUP:
+        case SOL_HANDLEDUP:
             parse_handle_dup(scheduler, action, time_ms, tok);
             break;
-        case EVENT_SOL_HANDLERW:
-            /*parse_handle_rw(scheduler, action, time_ms, tok);*/
-            break;
-        // init parameters for solution
-        case EVENT_SOL_INIT_SCHED:
+        case SOL_INIT_SCHED:
             parse_init_sched(scheduler, action, time_ms, tok);
             break;
-        // emulate handover and triggers solution
-        case EVENT_SOL_HO:
-            parse_handle_solution(scheduler, action, time_ms, tok); 
+        case SOL_HO:
+            parse_handle_solution(scheduler, action, time_ms, tok);
             break;
-
         default:
             log_error("No event matched at %d", time_ms);
+            free(tmp_str);
             return -1;
     }
     free(tmp_str);

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 iperf3=iperf3 # at least 3.9
-exe="/data/ztliu/emulator-test/build/emulator"
+emulator="/data/ztliu/emulator-test/build/emulator"
 algo="$1"
 
 if [ -z "$algo" ]
@@ -27,16 +27,25 @@ do
     for id in "${traces[@]}"
     do
         inputfname="./input/trace-$id-c.csv"
-        outputfname="./replay/sv-$id-$algo.log"
+        serverOutput="./output/server-$id-$algo.log"
+        clientOutput="./output/client-$id-$algo.log"
         echo "Input trace: $inputfname"
-        echo "Output file $outputfname"
         while true
         do
             read -p "> Run test? y/N <- " ans
             if ! [ -z "${ans}" ] && [ "${ans}" = "y" ]
             then
                 echo "Running test..."
-                $exe $inputfname $outputfname $algo
+
+                echo "[Client] $clientOutput"
+                sudo ip netns exec test_b $iperf3 -s -i 0.1 -J --logfile $clientOutput -1 &
+
+                sleep 1
+                
+                echo "[Server] $serverOutput"
+                sudo ip netns exec test_a $emulator $algo $inputfname
+                sudo mv ./sv-test-c.log $serverOutput
+                echo "[Server] Fixed server fname"
             else
                 echo "Skipped"
                 break

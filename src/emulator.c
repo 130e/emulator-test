@@ -22,7 +22,7 @@ void do_log_lock(bool lock, void *udata) {
 // each event might needs diff args
 int main(int argc, char **argv) {
   if (argc < 3) {
-    log_fatal("./emulator {name} input/{input file}.csv");
+    log_fatal("./emulator {run id} {input csv}");
     return -1;
   }
 
@@ -31,13 +31,12 @@ int main(int argc, char **argv) {
 
   log_set_lock(do_log_lock, NULL);
   // Logging setting
-  log_set_level(LOG_TRACE);
-  log_set_quiet(true);
-  // TODO: give log id
-  FILE* logFile = fopen("./debug.log", "w");
-  if (logFile == NULL)
-    return -1;
-  log_add_fp(logFile, LOG_FATAL);
+  log_set_level(LOG_ERROR);
+  // log_set_quiet(true);
+  //FILE* logFile = fopen("./debug.log", "w");
+  //if (logFile == NULL)
+  //  return -1;
+  //log_add_fp(logFile, LOG_TRACE);
 
   // main scheduler
   scheduler_ctx scheduler;
@@ -55,8 +54,10 @@ int main(int argc, char **argv) {
   // read input
   printf("Reading input\n");
   FILE* stream = fopen(argv[2], "r");
-  if (stream == NULL)
+  if (stream == NULL) {
+    printf("Error reading file %s\n", argv[2]);
     return -1;
+  }
   char line[CSV_MAX_LINESZ];
   while (fgets(line, CSV_MAX_LINESZ, stream) != NULL) {
     parse_event(&scheduler, &action, line);

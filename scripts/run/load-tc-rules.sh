@@ -63,6 +63,10 @@ case "$1" in
         echo "Params: $2 $3 $4 $5 $6 $7"
         modify "$2" "$3" "$4" "$5" "$6" "$7"
         ;;
+    test)
+        echo "Adding one TC for quick testing"
+        load veth0 75 10000 $((200 * 1000000)) $((64 * 1024)) 5
+        ;;
     *)
         echo "Usage: $0 {add|auto|mod} [ifname delay delayLimit rate queuesz jitter]"
         exit 1

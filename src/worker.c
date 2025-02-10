@@ -13,6 +13,31 @@
 #include "worker.h"
 #include "log.h"
 
+// Debugging
+int packet_logging(struct nfq_data *nfa) {
+    int handled = 0;
+
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    uint64_t ts = now.tv_sec * 1000 + now.tv_nsec / 1000000;
+
+    unsigned char *nf_packet;
+    int len = nfq_get_payload(nfa, &nf_packet);
+    if (len < sizeof(struct iphdr))
+        goto done;
+    struct iphdr *iph = ((struct iphdr *) nf_packet);
+    if (len < (iph->ihl << 2) + sizeof(struct tcphdr))
+        goto done;
+    if (iph->saddr == inet_addr("10.0.0.1")) {
+        struct tcphdr *tcph = ((struct tcphdr *) (nf_packet + (iph->ihl << 2)));
+        uint32_t seq = ntohl(tcph->seq);
+        uint32_t ack = ntohl(tcph->ack_seq);
+        log_fatal("packet,%llu,%u,%lu,%lu", ts, ntohs(tcph->source), seq, ack);
+    }
+    done:
+    return handled;
+}
+
 int worker_handle_drop(worker_ctx *ctx, int *ret, struct nfq_q_handle *qh, u_int32_t id);
 
 int worker_handle_reorder(worker_ctx *ctx, int *ret, struct nfq_q_handle *qh, u_int32_t id);
@@ -28,6 +53,7 @@ int worker_callback(struct nfq_q_handle *qh, struct nfgenmsg *nfmsg, struct nfq_
     ph = nfq_get_msg_packet_hdr(nfa);
     id = ntohl(ph->packet_id);
     int ret;
+    packet_logging(nfa);
     // handle drop
     if (worker_handle_drop(ctx, &ret, qh, id)) return ret;
     // handle reorder

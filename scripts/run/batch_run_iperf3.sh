@@ -15,34 +15,34 @@ if [ -z "$algo" ]; then
     exit
 fi
 
+debug=(0)
 downtown=({1..6})
 parkinglot=(7)
 sportpark=(8 9)
 airport=(10 11)
 seaport=(12 13)
 
-labels=('A' 'B' 'C' 'D' 'E')
-locations=(downtown parkinglot sportpark airport seaport)
+labels=('DEBUG' 'A' 'B' 'C' 'D' 'E')
+locations=(debug downtown parkinglot sportpark airport seaport)
 
 for loc_idx in "${!locations[@]}"; do
-    echo "location ${labels[$loc_idx]}"
+    echo "scenario ${labels[$loc_idx]}"
     echo "================"
     declare -n traces=${locations[$loc_idx]}
     for id in "${traces[@]}"; do
-        # DEBUG overrride
-        # id="debug"
-
         original_trace="$INPUTDIR/trace-$id.csv"
         emulator_input="$OUTPUTDIR/trace-$id-test.csv"
         sv_iperf_log="$OUTPUTDIR/server-iperf3-$id-$algo.log"
         sv_ss_log="$OUTPUTDIR/server-ss-$id-$algo.log"
         cl_iperf_log="$OUTPUTDIR/client-iperf3-$id-$algo.log"
 
-        echo "Input trace: $sv_iperf_log"
+        echo "Iperf3 server log: $sv_iperf_log"
+        echo "Iperf3 client log: $cl_iperf_log"
 
         # Generate test
         python3 $ROOTDIR/scripts/run/generate_input.py $original_trace $emulator_input $sv_iperf_log $sv_ss_log
 
+        echo "Remember to tcpdump -i any -s 100 -w trace-client.pcap"
         read -p "Start test? (will clean all logs) y/N <--- " ans </dev/tty
         if [ "$ans" = "y" ]; then
             if [ -f $cl_iperf_log ]; then

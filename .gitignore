@@ -13,9 +13,6 @@ libnfnetlink*
 # Generated
 emulator
 *.log
-*.csv
-*.png
-*.txt
 
 # CMake
 cmake-build-*/

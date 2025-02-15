@@ -36,29 +36,29 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    n = 2
+    n = 3
     fig, axes = plt.subplots(n)
 
     ax = axes[0]
     # iperf3
     iperf_output = args.throughput
     df_iperf = pd.read_csv(iperf_output)
-    ax.plot(df_iperf.time, df_iperf.throughput)
+    ax.plot(df_iperf.time, df_iperf.throughput, marker=".", markersize=3)
     ax.set_ylabel("Thuput(Mbps)")
 
     # Jitter
     ax = axes[1]
     df_jitter = pd.read_csv(args.jitter)
-    ax.plot(df_jitter.time, df_jitter.jitter)
-    ax.set_ylabel("Jitter")
+    ax.plot(df_jitter.time, df_jitter.jitter, marker=".", markersize=1)
+    ax.set_ylabel("Jitter(s)")
 
     # Frame completion time
-    # ax = axes[1]
-    # frame_output = args.frames
-    # df_frame = pd.read_csv(frame_output)
-    # df_frame = df_frame.sort_values(["completion_time"])
-    # ax.plot(df_frame.completion_time, df_frame.interval)
-    # ax.set_ylabel("frame_interval(s)")
+    ax = axes[2]
+    frame_output = args.frames
+    df_frame = pd.read_csv(frame_output)
+    df_frame = df_frame.sort_values(["completion_time"])
+    ax.plot(df_frame.completion_time, df_frame.interval, marker=".", markersize=1)
+    ax.set_ylabel("frame_interval(s)")
 
 #     ho_text = """7899,HO,0,2,199,1,26,0
 # 13602,HO,0,2,33,4,4,0
@@ -87,5 +87,5 @@ if __name__ == "__main__":
 #         prev_cell = cell
 #         ax.axvline(ho, color=color)
 
-    plt.title(args.name)
-    plt.savefig("Test.png")
+    # plt.title(args.name)
+    plt.savefig(f"test-{args.name}.png")

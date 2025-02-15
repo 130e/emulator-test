@@ -4,7 +4,7 @@ set -e
 
 ROOTDIR="/data/ztliu/emulator-test"
 INPUTDIR="$ROOTDIR/input"
-OUTPUTDIR="$ROOTDIR/output"
+OUTPUTDIR="$ROOTDIR/scripts/processing/output"
 iperf3=iperf3 # at least 3.9
 emulator="$ROOTDIR/build/emulator"
 PORT=5257
@@ -15,7 +15,7 @@ if [ -z "$algo" ]; then
     exit
 fi
 
-debug=(0)
+debug=("sub6mmw")
 downtown=({1..6})
 parkinglot=(7)
 sportpark=(8 9)
@@ -32,9 +32,9 @@ for loc_idx in "${!locations[@]}"; do
     for id in "${traces[@]}"; do
         original_trace="$INPUTDIR/trace-$id.csv"
         emulator_input="$OUTPUTDIR/trace-$id-test.csv"
-        sv_iperf_log="$OUTPUTDIR/server-iperf3-$id-$algo.log"
-        sv_ss_log="$OUTPUTDIR/server-ss-$id-$algo.log"
-        cl_iperf_log="$OUTPUTDIR/client-iperf3-$id-$algo.log"
+        sv_iperf_log="$OUTPUTDIR/$algo-$id-iperf-server.json"
+        sv_ss_log="$OUTPUTDIR/$algo-$id-ss-server.log"
+        cl_iperf_log="$OUTPUTDIR/$algo-$id-iperf-client.json"
 
         echo "Iperf3 server log: $sv_iperf_log"
         echo "Iperf3 client log: $cl_iperf_log"
@@ -42,7 +42,7 @@ for loc_idx in "${!locations[@]}"; do
         # Generate test
         python3 $ROOTDIR/scripts/run/generate_input.py $original_trace $emulator_input $sv_iperf_log $sv_ss_log
 
-        echo "Remember to tcpdump -i any -s 100 -w trace-client.pcap"
+        echo "Remember to tcpdump -i any -s 100 -w $algo-$id-capture-client.pcap"
         read -p "Start test? (will clean all logs) y/N <--- " ans </dev/tty
         if [ "$ans" = "y" ]; then
             if [ -f $cl_iperf_log ]; then
@@ -58,9 +58,13 @@ for loc_idx in "${!locations[@]}"; do
             fi
             sudo ip netns exec test_a $emulator $algo $emulator_input
             sleep 5
+
+            mv ./packet.log "$OUTPUTDIR/$algo-$id-capture-server.log"
         fi
 
         echo "----------------"
-        read -p "Press Enter to continue" </dev/tty
+        # read -p "Press Enter to continue" </dev/tty
+        break
     done
+    break
 done

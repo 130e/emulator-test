@@ -35,6 +35,10 @@ def generate_trace(input_trace, output_trace, extras):
             execution_time -= 5
             execution_time = int(execution_time)
 
+            # Ensure linebreak at the end of file
+            if lines[-1][-1] != "\n":
+                lines[-1] = f"{lines[-1]}\n"
+
             # FIXME: default to 5257
             # Iperf3
             logname = extras[0]

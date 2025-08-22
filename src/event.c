@@ -8,8 +8,9 @@
 // event format: time_ms event_id data...
 
 // cmd
-int parse_cmd(scheduler_ctx *scheduler, int time_ms, char *data) {
-    char *buf = malloc(strlen(data)+1);
+int parse_cmd(scheduler_ctx *scheduler, int time_ms, char *data)
+{
+    char *buf = malloc(strlen(data) + 1);
     strcpy(buf, data);
     log_info("Run cmd %s", buf);
     action_command_args *args = malloc(sizeof(action_command_args));
@@ -18,7 +19,8 @@ int parse_cmd(scheduler_ctx *scheduler, int time_ms, char *data) {
 }
 
 // queue_num new_mark gap reord_cnt reord_offset loss
-int parse_ho(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data) {
+int parse_ho(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data)
+{
     // handle OUTQ
     char *tok = data;
     int queue_num = strtol(tok, NULL, 0);
@@ -49,7 +51,13 @@ int parse_ho(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *da
     mark_args->mark = mark;
     scheduler_add_event(scheduler, time_ms, action_set_mark, mark_args);
 
-    if (drop_cnt > 0) {
+    // Zhutian
+    if (reord_cnt > 0) {
+        drop_cnt = reord_cnt+10;
+    }
+
+    if (drop_cnt > 0)
+    {
         action_set_drop_args *drop_args = malloc(sizeof(action_set_drop_args));
         drop_args->ctx = action;
         drop_args->queue_num = queue_num;
@@ -58,7 +66,31 @@ int parse_ho(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *da
         scheduler_add_event(scheduler, time_ms, action_set_drop, drop_args);
     }
 
-    if (reord_cnt > 0) {
+    // Zhutian: Temp modification
+    // Power fix
+    if (reord_cnt > 0)
+    // if (false)
+    {
+        // reord_cnt = 1;
+        // reord_offset = 2;
+        // reord_cnt -= 10;
+        // if (reord_cnt > 2)
+        // {
+        //     reord_cnt = 2;
+        // }
+        // else if (reord_cnt < 0)
+        // {
+        //     reord_cnt = 0;
+        // }
+        // reord_offset -= 10;
+        // if (reord_offset > 5)
+        // {
+        //     reord_offset = 5;
+        // }
+        // else if (reord_offset < 0)
+        // {
+        //     reord_offset = 0;
+        // }
         action_set_reorder_args *reord_args = malloc(sizeof(action_set_reorder_args));
         reord_args->ctx = action;
         reord_args->queue_num = queue_num;
@@ -72,7 +104,8 @@ int parse_ho(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *da
 }
 
 // data: queue_num mark end_ms
-int parse_init(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data) {
+int parse_init(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data)
+{
     char *tok = data;
     int queue_num = strtol(tok, NULL, 0);
     tok = strtok(NULL, ",");
@@ -96,7 +129,8 @@ int parse_init(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *
     start_args->queue_num = queue_num;
     scheduler_add_event(scheduler, time_ms, action_start_nfqueue, start_args);
 
-    if (mark > 0) {
+    if (mark > 0)
+    {
         action_set_mark_args *mark_args = malloc(sizeof(action_set_mark_args));
         mark_args->ctx = action;
         mark_args->queue_num = queue_num;
@@ -107,7 +141,8 @@ int parse_init(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *
 }
 
 // data: queue_num enable
-int parse_handle_dup(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data) {
+int parse_handle_dup(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data)
+{
     char *tok = data;
     int queue_num = strtol(tok, NULL, 0);
     tok = strtok(NULL, ",");
@@ -124,25 +159,26 @@ int parse_handle_dup(scheduler_ctx *scheduler, action_ctx *action, int time_ms, 
 
 // data: queue_num enable rwnd
 /*int parse_handle_rw(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data) {*/
-    /*char *tok = data;*/
-    /*int queue_num = strtol(tok, NULL, 0);*/
-    /*tok = strtok(NULL, ",");*/
-    /*int enable = strtol(tok, NULL, 0);*/
-    /*tok = strtok(NULL, ",");*/
-    /*int rwnd = strtol(tok, NULL, 0);*/
+/*char *tok = data;*/
+/*int queue_num = strtol(tok, NULL, 0);*/
+/*tok = strtok(NULL, ",");*/
+/*int enable = strtol(tok, NULL, 0);*/
+/*tok = strtok(NULL, ",");*/
+/*int rwnd = strtol(tok, NULL, 0);*/
 
-    /*action_set_rwnd_args *rw_args = malloc(sizeof(action_set_rwnd_args));*/
-    /*rw_args->ctx = action;*/
-    /*rw_args->enable = enable;*/
-    /*rw_args->queue_num = queue_num;*/
-    /*rw_args->rwnd = rwnd;*/
-    /*scheduler_add_event(scheduler, time_ms, action_set_rwnd, rw_args);*/
+/*action_set_rwnd_args *rw_args = malloc(sizeof(action_set_rwnd_args));*/
+/*rw_args->ctx = action;*/
+/*rw_args->enable = enable;*/
+/*rw_args->queue_num = queue_num;*/
+/*rw_args->rwnd = rwnd;*/
+/*scheduler_add_event(scheduler, time_ms, action_set_rwnd, rw_args);*/
 
-    /*return 0;*/
+/*return 0;*/
 /*}*/
 
 // data: qid enable_rw burst_sample threshold pace link prams...
-int parse_init_sched(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data) {
+int parse_init_sched(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data)
+{
     char *tok = data;
     int queue_num = strtol(tok, NULL, 0);
     tok = strtok(NULL, ",");
@@ -166,7 +202,8 @@ int parse_init_sched(scheduler_ctx *scheduler, action_ctx *action, int time_ms, 
     args->fire = start_time;
     args->mark = 1;
     // default value for lte, mmw
-    for (int i=1; i<3; i++) {
+    for (int i = 1; i < 3; i++)
+    {
         tok = strtok(NULL, ",");
         int mark = strtol(tok, NULL, 0);
         args->init_param[i].mark = mark;
@@ -183,7 +220,8 @@ int parse_init_sched(scheduler_ctx *scheduler, action_ctx *action, int time_ms, 
 
 // data: queue_num enable_freeze freeze_ms enable_dedup smooth_ms burst_duration enable_adapt
 // enable_adapt threshold pace
-int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data) {
+int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time_ms, char *data)
+{
     char *tok = data;
     int queue_num = strtol(tok, NULL, 0);
     // mark
@@ -213,7 +251,8 @@ int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time
     scheduler_add_event(scheduler, time_ms, action_sol_update, sol_args);
 
     // zero window until rach
-    if (enable_freeze > 0) {
+    if (enable_freeze > 0)
+    {
         // auto adjust implicitly disabled
         action_set_rwnd_args *rw_args = malloc(sizeof(action_set_rwnd_args));
         rw_args->ctx = action;
@@ -223,7 +262,8 @@ int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time
     }
     time_ms += freeze_ms;
     // dedup
-    if (enable_dedup > 0) {
+    if (enable_dedup > 0)
+    {
         action_set_dedup_args *dedup_args = malloc(sizeof(action_set_dedup_args));
         dedup_args->ctx = action;
         dedup_args->enable = true;
@@ -237,7 +277,8 @@ int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time
         scheduler_add_event(scheduler, time_ms + smooth_ms, action_set_dedup, dedup_args);
     }
     // burst estimation
-    if (burst_duration > 0) {
+    if (burst_duration > 0)
+    {
         action_set_burst_args *burst_args = malloc(sizeof(action_set_burst_args));
         burst_args->ctx = action;
         burst_args->enable = true;
@@ -252,7 +293,8 @@ int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time
     }
     time_ms += burst_duration;
     // passive adaptation
-    if (enable_adapt > 0) {
+    if (enable_adapt > 0)
+    {
         action_set_adapt_args *args = malloc(sizeof(action_set_adapt_args));
         args->ctx = action;
         args->start_time = time_ms;
@@ -264,19 +306,28 @@ int parse_handle_solution(scheduler_ctx *scheduler, action_ctx *action, int time
 }
 
 // Function to map event type strings to enum
-event_type get_event_type(const char *event_str) {
-    if (strcmp(event_str, "INIT") == 0) return INIT;
-    if (strcmp(event_str, "CMD") == 0) return CMD;
-    if (strcmp(event_str, "HO") == 0) return HO;
-    if (strcmp(event_str, "SOL_HANDLEDUP") == 0) return SOL_HANDLEDUP;
-    if (strcmp(event_str, "SOL_HANDLERW") == 0) return SOL_HANDLERW;
-    if (strcmp(event_str, "SOL_INIT_SCHED") == 0) return SOL_INIT_SCHED;
-    if (strcmp(event_str, "SOL_HO") == 0) return SOL_HO;
+event_type get_event_type(const char *event_str)
+{
+    if (strcmp(event_str, "INIT") == 0)
+        return INIT;
+    if (strcmp(event_str, "CMD") == 0)
+        return CMD;
+    if (strcmp(event_str, "HO") == 0)
+        return HO;
+    if (strcmp(event_str, "SOL_HANDLEDUP") == 0)
+        return SOL_HANDLEDUP;
+    if (strcmp(event_str, "SOL_HANDLERW") == 0)
+        return SOL_HANDLERW;
+    if (strcmp(event_str, "SOL_INIT_SCHED") == 0)
+        return SOL_INIT_SCHED;
+    if (strcmp(event_str, "SOL_HO") == 0)
+        return SOL_HO;
     return UNKNOWN;
 }
 
 // Updated parse_event function
-int parse_event(scheduler_ctx *scheduler, action_ctx *action, char *text) {
+int parse_event(scheduler_ctx *scheduler, action_ctx *action, char *text)
+{
     char *tmp_str, *tok;
     tmp_str = strdup(text);
 
@@ -288,29 +339,30 @@ int parse_event(scheduler_ctx *scheduler, action_ctx *action, char *text) {
     log_trace("Reading event %s", tok);
 
     tok = strtok(NULL, ","); // additional parameters
-    switch (event) {
-        case INIT:
-            parse_init(scheduler, action, time_ms, tok);
-            break;
-        case CMD:
-            parse_cmd(scheduler, time_ms, tok);
-            break;
-        case HO:
-            parse_ho(scheduler, action, time_ms, tok);
-            break;
-        case SOL_HANDLEDUP:
-            parse_handle_dup(scheduler, action, time_ms, tok);
-            break;
-        case SOL_INIT_SCHED:
-            parse_init_sched(scheduler, action, time_ms, tok);
-            break;
-        case SOL_HO:
-            parse_handle_solution(scheduler, action, time_ms, tok);
-            break;
-        default:
-            log_error("No event matched at %d", time_ms);
-            free(tmp_str);
-            return -1;
+    switch (event)
+    {
+    case INIT:
+        parse_init(scheduler, action, time_ms, tok);
+        break;
+    case CMD:
+        parse_cmd(scheduler, time_ms, tok);
+        break;
+    case HO:
+        parse_ho(scheduler, action, time_ms, tok);
+        break;
+    case SOL_HANDLEDUP:
+        parse_handle_dup(scheduler, action, time_ms, tok);
+        break;
+    case SOL_INIT_SCHED:
+        parse_init_sched(scheduler, action, time_ms, tok);
+        break;
+    case SOL_HO:
+        parse_handle_solution(scheduler, action, time_ms, tok);
+        break;
+    default:
+        log_error("No event matched at %d", time_ms);
+        free(tmp_str);
+        return -1;
     }
     free(tmp_str);
     return 0;

@@ -58,6 +58,7 @@ monitor_connection() {
 
         # Run the command and capture output
         # Prefix IP
+        # TODO: ss format is not the same between versions!
         output=$(ss -it | grep -F "10.0.0.2:$PORT" -A 1 | grep -v -F "10.0.0.2:$PORT")
 
         # Write to log file

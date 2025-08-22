@@ -15,7 +15,7 @@ if [ -z "$algo" ]; then
     exit
 fi
 
-debug=("sub6mmw")
+debug=(5)
 downtown=({1..6})
 parkinglot=(7)
 sportpark=(8 9)
@@ -39,32 +39,39 @@ for loc_idx in "${!locations[@]}"; do
         echo "Iperf3 server log: $sv_iperf_log"
         echo "Iperf3 client log: $cl_iperf_log"
 
-        # Generate test
-        python3 $ROOTDIR/scripts/run/generate_input.py $original_trace $emulator_input $sv_iperf_log $sv_ss_log
+        while [ true ]; do
+            echo "Remember to run tcpdump:"
+            echo "  tcpdump -i any -s 100 -w $algo-$id-capture-client.pcap"
+            read -p "Start test? (clean all logs) y/N <--- " ans </dev/tty
+            if [ "$ans" = "y" ]; then
+                # Generate test
+                python3 $ROOTDIR/scripts/run/generate_input.py $original_trace $emulator_input $sv_iperf_log $sv_ss_log
+                if pgrep -x "iperf3" >/dev/null; then
+                    echo "Error: there are unfinished iperf3 process"
+                    echo "----------------"
+                else
+                    if [ -f $cl_iperf_log ]; then
+                        rm -f $cl_iperf_log
+                    fi
+                    sudo ip netns exec test_b $iperf3 -s -p $PORT -i 0.1 -J --logfile $cl_iperf_log -1 &
+                    sleep 2
+                    if [ -f $sv_iperf_log ]; then
+                        rm -f $sv_iperf_log
+                    fi
+                    if [ -f $sv_ss_log ]; then
+                        rm -f $sv_ss_log
+                    fi
+                    sudo ip netns exec test_a $emulator $algo $emulator_input
+                    sleep 5
+                    echo -e "\a"
 
-        echo "Remember to tcpdump -i any -s 100 -w $algo-$id-capture-client.pcap"
-        read -p "Start test? (will clean all logs) y/N <--- " ans </dev/tty
-        if [ "$ans" = "y" ]; then
-            if [ -f $cl_iperf_log ]; then
-                rm -f $cl_iperf_log
+                    mv ./packet.log "$OUTPUTDIR/$algo-$id-capture-server.log"
+                fi
+            else
+                break
             fi
-            sudo ip netns exec test_b $iperf3 -s -p $PORT -i 0.1 -J --logfile $cl_iperf_log -1 &
-            sleep 2
-            if [ -f $sv_iperf_log ]; then
-                rm -f $sv_iperf_log
-            fi
-            if [ -f $sv_ss_log ]; then
-                rm -f $sv_ss_log
-            fi
-            sudo ip netns exec test_a $emulator $algo $emulator_input
-            sleep 5
-
-            mv ./packet.log "$OUTPUTDIR/$algo-$id-capture-server.log"
-        fi
-
+            echo "----------------"
+        done
         echo "----------------"
-        # read -p "Press Enter to continue" </dev/tty
-        break
     done
-    break
 done

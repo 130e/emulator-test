@@ -108,3 +108,11 @@ iperf3 -s -1
 cd emulator-test/build/
 ./emulator test_name ../input/trace-debug.csv
 ```
+
+## Note
+
+Trace input format
+```
+Handover
+queue_num new_mark gap reord_cnt reord_offset loss
+```

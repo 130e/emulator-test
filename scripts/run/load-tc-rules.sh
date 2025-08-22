@@ -55,8 +55,10 @@ case "$1" in
         ;;
     auto)
         echo "Automatically creating TC rules for handover testing (ignore params)"
-        load veth1 75 10000 $((200 * 1000000)) $((64 * 1024)) 5
-        load veth2 33 10000 $((1400 * 1000000)) $((1024 * 1024)) 3
+        # load veth1 75 5000 $((200 * 1000000)) $((64 * 1024)) 5
+        # load veth2 25 5000 $((1500 * 1000000)) $((128 * 1024)) 4
+        load veth1 75 2000 $((200 * 1000000)) $((64 * 1024)) 5
+        load veth2 33 4000 $((1000 * 1000000)) $((512 * 1024)) 3
         ;;
     mod)
         echo "Modifying TC rules"
@@ -65,7 +67,7 @@ case "$1" in
         ;;
     test)
         echo "Adding one TC for quick testing"
-        load veth0 75 10000 $((200 * 1000000)) $((64 * 1024)) 5
+        load veth0 75 10000 $((200 * 1000000)) $((1024 * 1024)) 5
         ;;
     *)
         echo "Usage: $0 {add|auto|mod} [ifname delay delayLimit rate queuesz jitter]"

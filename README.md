@@ -1,18 +1,16 @@
 # 5G Handover Emulator
 
-Tested on Arch 6.5/Ubuntu 22.04/Debian 12, also Android 11(instruction WIP).
+Tested on Arch 6.5/Ubuntu 22.04/Debian 12, also Android 11 (instruction WIP).
 
 ## Installation
 
-Following instructions describe how to compile a statically linked binary `emulator`. The dependencies `libnetfilter_queue` will be compiled locally.
+This section walks through compiling a statically linked binary `emulator`, using locally compiled dependency `libnetfilter_queue`.
 
-Alternatively, you can install the required `libnetfilter_queue` through other methods (distro packages) and compiled a dynamically linked binary instead. In this case you need to ajust the CMakeList.txt accordingly.
+Alternatively, install from package manager and compiled a dynamically linked binary instead. In that case adjust `CMakeList.txt` accordingly.
 
 ### Build Dependencies 
 
-1. Install tools
-
-Tools like gcc, cmake, make are needed. Install them for your environment.
+#### 1. Install Compiler Tools
 
 ```bash
 # Examples
@@ -22,7 +20,7 @@ sudo pacman -S base-devel cmake
 sudo apt install build-essential cmake
 ```
 
-2. Get Source
+#### 2. Get Source
 
 Visit [netfilter project website](https://netfilter.org) and download the source files. We are using libnfnetlink-1.0.2 and libnetfilter_queue-1.0.5.
 
@@ -36,7 +34,7 @@ cd libnfnetlink-1.0.2
 make
 make install
 cd ..
-# Same for libnetfilter_queue
+# Do the same for libnetfilter_queue
 cd libnetfilter_queue-1.0.5
 ./configure --prefix=$(pwd)/../lib --enable-static --disable-shared
 make
@@ -44,11 +42,12 @@ make install
 cd ..
 ```
 
-At this point, both libraries are installed in the `./lib` directory.
+Now both libraries are installed in the `./lib` directory.
 
 ### Build Project
 
 Run CMake to configure the build process:
+
 ```bash
 cmake -B build .
 cd build
@@ -57,19 +56,20 @@ make
 ./emulator
 # It should complain that no input trace is provided
 ```
+
 The binary is `build/emulator`.
 
-### Using emulator with virtual network
+### Emulation Example
 
-We will create two network namespace, acting as two hosts; then create 3 network interface between them.
+In this example, we will create two network namespace, and then create 3 network interface between them.
 
-1. Setup network namespace
+#### 1. Setup network namespace
 
-Get 130e/script-pool and check the host has required capability (iptables netfilterqueue, tc, tbf, netem, etc.)
+Ensure the emulation host has required capability (iptables netfilterqueue, tc, tbf, netem, etc.)
 
 ```bash
 # Run setup for once
-cd script-pool/emulator/
+cd scripts/run/
 # create two ns and three interfaces
 # test_a -veth0- test_b
 #        -veth1-
@@ -109,7 +109,7 @@ cd emulator-test/build/
 ./emulator test_name ../input/trace-debug.csv
 ```
 
-## Note
+## Trace format
 
 Trace input format
 ```

@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -10,8 +11,8 @@
 #define RWSCALE 10
 
 void action_init_ctx(action_ctx *ctx) {
-    ctx->queues = (nfq_ctx **) malloc(sizeof(nfq_ctx *) * ACTION_MAX_NFQUEUE);
-    ctx->workers = (worker_ctx **) malloc(sizeof(worker_ctx *) * ACTION_MAX_NFQUEUE);
+    ctx->queues = (nfq_ctx **) calloc(ACTION_MAX_NFQUEUE, sizeof(nfq_ctx *));
+    ctx->workers = (worker_ctx **) calloc(ACTION_MAX_NFQUEUE, sizeof(worker_ctx *));
 }
 
 void init_tcp_scheduler(tcp_ctx *ctx, action_ctx *action) {
@@ -98,8 +99,10 @@ void action_init_nfqueue(void *data) {
     worker_ctx *wctx = malloc(sizeof(worker_ctx));
     worker_init_ctx(wctx, "");
     if (nfq_init(qctx, args->queue_num, worker_callback, wctx)) {
-        log_error("failed to initialize nfqueue %d: %s", args->queue_num, strerror(errno));
-        return;
+        log_fatal("failed to initialize nfqueue %d: %s", args->queue_num, strerror(errno));
+        free(qctx);
+        free(wctx);
+        exit(1);
     }
     args->ctx->queues[args->queue_num] = qctx;
     args->ctx->workers[args->queue_num] = wctx;

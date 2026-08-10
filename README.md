@@ -25,21 +25,22 @@ sudo apt install build-essential cmake
 Visit [netfilter project website](https://netfilter.org) and download the source files. We are using libnfnetlink-1.0.2 and libnetfilter_queue-1.0.5.
 
 ```bash
-# Extract the Libraries
+# Get the source
+mkdir -p dep/
+cd dep/
+# wget ....
 tar -xjf libnfnetlink-1.0.2.tar.bz2
-tar -xjf libnetfilter_queue-1.0.5.tar.bz2
+# ...
+
 # Compile and Install netlink first
 cd libnfnetlink-1.0.2
-./configure --prefix=$(pwd)/../lib --enable-static --disable-shared
-make
-make install
-cd ..
+./configure --prefix=$(pwd)/../ --enable-static --disable-shared
+make && make install
+
 # Do the same for libnetfilter_queue
-cd libnetfilter_queue-1.0.5
-./configure --prefix=$(pwd)/../lib --enable-static --disable-shared
-make
-make install
-cd ..
+cd ../libnetfilter_queue-1.0.5
+PKG_CONFIG_PATH=$(pwd)/../lib/pkgconfig ./configure --prefix=$(pwd)/../ --enable-static --disable-shared
+make && make install
 ```
 
 Now both libraries are installed in the `./lib` directory.
@@ -50,11 +51,9 @@ Run CMake to configure the build process:
 
 ```bash
 cmake -B build .
-cd build
-make
-# Test run
+cd build && make
+# Test run. It should complain that no input trace is provided
 ./emulator
-# It should complain that no input trace is provided
 ```
 
 The binary is `build/emulator`.

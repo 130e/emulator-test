@@ -1,11 +1,16 @@
 #include <errno.h>
 #include <pthread.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
 
 #include "nfqueue.h"
 #include "log.h"
+
+/* A netlink message is the copied packet plus ~60 bytes of header/attributes. */
+_Static_assert(NFQ_MSG_BUF > NFQ_PKT_SIZE + 256,
+               "NFQ_MSG_BUF must leave room for the nfnetlink header and attributes");
 
 enum nfq_status {
     NFQ_STOPPED = 0,
@@ -24,7 +29,16 @@ int nfq_init(nfq_ctx *ctx, uint16_t queue_num, nfq_callback *cb, void *data) {
     }
     unsigned int n;
     if ((n = nfnl_rcvbufsiz(nfq_nfnlh(ctx->h), NFQ_QUEUE_SIZE * NFQ_PKT_SIZE)) < NFQ_QUEUE_SIZE * NFQ_PKT_SIZE) {
-        log_warn("requested queue size %u, get %u", NFQ_QUEUE_SIZE * NFQ_PKT_SIZE, n);
+        /*
+         * The kernel caps this at 2 * net.core.rmem_max (a global sysctl, not
+         * per-netns) unless we hold CAP_NET_ADMIN in the initial user
+         * namespace. Report the numbers: errno alone says nothing useful here.
+         */
+        log_fatal("requested queue size %u, get %u", NFQ_QUEUE_SIZE * NFQ_PKT_SIZE, n);
+        fprintf(stderr, "[Emulator] nfqueue %hu: requested receive buffer %u, got %u; "
+                        "raise net.core.rmem_max to at least %u\n",
+                queue_num, NFQ_QUEUE_SIZE * NFQ_PKT_SIZE, n,
+                (NFQ_QUEUE_SIZE * NFQ_PKT_SIZE) / 2);
         return -1;
     }
     ctx->qh = nfq_create_queue(ctx->h, queue_num, cb, data);
@@ -77,7 +91,7 @@ int nfq_teardown(nfq_ctx *ctx) {
 
 void *nfq_run(void *data) {
     int n;
-    char buf[NFQ_PKT_SIZE];
+    char buf[NFQ_MSG_BUF];
     nfq_ctx *ctx = (nfq_ctx *) data;
     log_debug("starting nfq loop for queue %hu", ctx->queue_num);
     while (1) {

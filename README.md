@@ -97,6 +97,7 @@ You only need to run these **once** in your test_a (sender) environment.
 3. Run experiments
 
 Go back to the emulator folder. We will run a debug trace to test the emulator.
+
 ```bash
 # Host B (ns 10.0.0.2)
 # listening for one iperf3 connection
@@ -110,8 +111,8 @@ cd emulator-test/build/
 
 ## Trace format
 
-Trace input format
-```
-Handover
-queue_num new_mark gap reord_cnt reord_offset loss
+The replay trace is stored as csv. Each line an event. For handovers,
+
+```csv
+time_ms,HO,queue_num,new_mark,gap_ms,reord_cnt,reord_offset,loss
 ```

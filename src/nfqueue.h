@@ -1,8 +1,8 @@
 #ifndef HANDOFF_NFQUEUE_H
 #define HANDOFF_NFQUEUE_H
 
-#include <stdint.h>
 #include <libnetfilter_queue/libnetfilter_queue.h>
+#include <stdint.h>
 
 /* NFQ_QUEUE_SIZE is the max number of packets the kernel holds in the queue. */
 #define NFQ_QUEUE_SIZE (4096)
@@ -28,11 +28,11 @@
 #define NFQ_MSG_BUF (65536)
 
 typedef struct {
-    uint16_t queue_num;
-    struct nfq_handle *h;
-    struct nfq_q_handle *qh;
-    int fd;
-    int status;
+  uint16_t queue_num;
+  struct nfq_handle *h;
+  struct nfq_q_handle *qh;
+  int fd;
+  int status;
 } nfq_ctx;
 
 /*
@@ -54,4 +54,4 @@ void nfq_stop(nfq_ctx *ctx);
 /* nfq_teardown closes the queue */
 int nfq_teardown(nfq_ctx *ctx);
 
-#endif //HANDOFF_NFQUEUE_H
+#endif // HANDOFF_NFQUEUE_H

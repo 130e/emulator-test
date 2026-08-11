@@ -1,18 +1,17 @@
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
 #include "action.h"
-#include "nfqueue.h"
-#include "worker.h"
-#include "scheduler.h"
-#include "log.h"
 #include "event.h"
+#include "log.h"
+#include "nfqueue.h"
+#include "scheduler.h"
+#include "worker.h"
 
 pthread_mutex_t log_lock = PTHREAD_MUTEX_INITIALIZER;
 
-void do_log_lock(bool lock, void *udata)
-{
+void do_log_lock(bool lock, void *udata) {
   if (lock)
     pthread_mutex_lock(&log_lock);
   else
@@ -23,10 +22,8 @@ void do_log_lock(bool lock, void *udata)
 // action is queues and workers, one
 // scheduler is one clock
 // each event might needs diff args
-int main(int argc, char **argv)
-{
-  if (argc < 3)
-  {
+int main(int argc, char **argv) {
+  if (argc < 3) {
     log_fatal("./emulator {run id} {input csv}");
     return -1;
   }
@@ -59,14 +56,12 @@ int main(int argc, char **argv)
   // read input
   printf("Reading input\n");
   FILE *stream = fopen(argv[2], "r");
-  if (stream == NULL)
-  {
+  if (stream == NULL) {
     printf("Error reading file %s\n", argv[2]);
     return -1;
   }
   char line[CSV_MAX_LINESZ];
-  while (fgets(line, CSV_MAX_LINESZ, stream) != NULL)
-  {
+  while (fgets(line, CSV_MAX_LINESZ, stream) != NULL) {
     parse_event(&scheduler, &action, line);
   }
 
@@ -75,23 +70,36 @@ int main(int argc, char **argv)
   /*int end_ms = 30000;*/
   /*int simu_end_ms = end_ms + 3000;*/
   /*// output queue*/
-  /*action_init_nfqueue_args action_init_args = {.ctx = &action, .queue_num = 0};*/
-  /*scheduler_add_event(&scheduler, 0, action_init_nfqueue, &action_init_args);*/
-  /*action_teardown_nfqueue_args action_teardown_args = {.ctx = &action, .queue_num = 0};*/
-  /*scheduler_add_event(&scheduler, simu_end_ms, action_teardown_nfqueue, &action_teardown_args);*/
-  /*action_start_nfqueue_args action_start_args = {.ctx = &action, .queue_num = 0};*/
-  /*scheduler_add_event(&scheduler, 0, action_start_nfqueue, &action_start_args);*/
+  /*action_init_nfqueue_args action_init_args = {.ctx = &action, .queue_num =
+   * 0};*/
+  /*scheduler_add_event(&scheduler, 0, action_init_nfqueue,
+   * &action_init_args);*/
+  /*action_teardown_nfqueue_args action_teardown_args = {.ctx = &action,
+   * .queue_num = 0};*/
+  /*scheduler_add_event(&scheduler, simu_end_ms, action_teardown_nfqueue,
+   * &action_teardown_args);*/
+  /*action_start_nfqueue_args action_start_args = {.ctx = &action, .queue_num =
+   * 0};*/
+  /*scheduler_add_event(&scheduler, 0, action_start_nfqueue,
+   * &action_start_args);*/
 
   /*// input*/
-  /*action_init_nfqueue_args action_init1_args = {.ctx = &action, .queue_num = 1};*/
-  /*scheduler_add_event(&scheduler, 0, action_init_nfqueue, &action_init1_args);*/
-  /*action_teardown_nfqueue_args action_teardown1_args = {.ctx = &action, .queue_num = 1};*/
-  /*scheduler_add_event(&scheduler, simu_end_ms, action_teardown_nfqueue, &action_teardown1_args);*/
-  /*action_start_nfqueue_args action_start1_args = {.ctx = &action, .queue_num = 1};*/
-  /*scheduler_add_event(&scheduler, 0, action_start_nfqueue, &action_start1_args);*/
+  /*action_init_nfqueue_args action_init1_args = {.ctx = &action, .queue_num =
+   * 1};*/
+  /*scheduler_add_event(&scheduler, 0, action_init_nfqueue,
+   * &action_init1_args);*/
+  /*action_teardown_nfqueue_args action_teardown1_args = {.ctx = &action,
+   * .queue_num = 1};*/
+  /*scheduler_add_event(&scheduler, simu_end_ms, action_teardown_nfqueue,
+   * &action_teardown1_args);*/
+  /*action_start_nfqueue_args action_start1_args = {.ctx = &action, .queue_num =
+   * 1};*/
+  /*scheduler_add_event(&scheduler, 0, action_start_nfqueue,
+   * &action_start1_args);*/
 
   /*// mark*/
-  /*action_set_mark_args action_mark_args = {.ctx = &action, .queue_num = 0, .mark = 1};*/
+  /*action_set_mark_args action_mark_args = {.ctx = &action, .queue_num = 0,
+   * .mark = 1};*/
   /*scheduler_add_event(&scheduler, 0, action_set_mark, &action_mark_args);*/
 
   printf("Emulator starts\n");
